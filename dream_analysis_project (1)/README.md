@@ -1,5 +1,4 @@
 # 🌙 DreamSense — Dream Analysis & Prediction System
-### Final Year B.Tech Project | CSE Department
 
 ---
 
@@ -74,9 +73,3 @@ dream_app/
 
 ---
 
-## Submitted By
-**[Your Name]**  
-Roll No: ________  
-Department: Computer Science & Engineering  
-Supervisor: [Supervisor Name]  
-Academic Year: 2025–26
