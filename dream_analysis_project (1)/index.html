@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DreamSense - Dream Analysis System</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: Arial, sans-serif; background: #f4f4f4; color: #333; font-size: 15px; }
+  header { background: #4a235a; color: white; text-align: center; padding: 24px 20px; }
+  header h1 { font-size: 1.8rem; font-weight: bold; }
+  header p { margin-top: 6px; font-size: 0.9rem; color: #ddd; }
+  .container { max-width: 700px; margin: 30px auto; padding: 0 16px; }
+  .box { background: white; border: 1px solid #ccc; border-radius: 6px; padding: 24px; margin-bottom: 20px; }
+  label { display: block; font-weight: bold; margin-bottom: 5px; font-size: 0.88rem; }
+  textarea, select, input[type=number] { width: 100%; padding: 9px 10px; border: 1px solid #bbb; border-radius: 4px; font-size: 0.92rem; font-family: Arial, sans-serif; background: #fafafa; color: #333; outline: none; }
+  textarea { resize: vertical; min-height: 110px; }
+  textarea:focus, select:focus, input:focus { border-color: #4a235a; }
+  .row { display: flex; gap: 14px; margin-top: 16px; flex-wrap: wrap; }
+  .row > div { flex: 1; min-width: 140px; }
+  .btn { display: block; width: 100%; margin-top: 18px; padding: 12px; background: #4a235a; color: white; border: none; border-radius: 4px; font-size: 1rem; cursor: pointer; }
+  .btn:hover { background: #5c2d72; }
+  .btn-secondary { display: inline-block; margin-top: 14px; padding: 9px 22px; background: white; color: #4a235a; border: 1px solid #4a235a; border-radius: 4px; font-size: 0.9rem; cursor: pointer; }
+  .btn-secondary:hover { background: #f0eaf4; }
+  #loading { display: none; text-align: center; padding: 30px; color: #666; }
+  #error-box { display: none; }
+  .error-msg { background: #fff0f0; border: 1px solid #f5c6c6; border-radius: 4px; padding: 12px 16px; color: #c0392b; margin-bottom: 16px; font-size: 0.9rem; }
+  #results { display: none; }
+  .result-summary { background: #f9f4fc; border: 1px solid #d0b0e0; border-radius: 6px; padding: 16px 20px; margin-bottom: 16px; }
+  .result-summary h2 { font-size: 1.1rem; color: #4a235a; margin-bottom: 10px; }
+  .tags { display: flex; gap: 10px; flex-wrap: wrap; }
+  .tag { background: #ede0f5; border: 1px solid #c8a0e0; border-radius: 4px; padding: 4px 12px; font-size: 0.82rem; color: #4a235a; }
+  .tag.mood { background: #fef6e0; border-color: #e8c96a; color: #7a5a00; }
+  .tag.conf { background: #e8f5ec; border-color: #7dc89a; color: #1a6a36; }
+  .symbols-section { margin-bottom: 16px; }
+  .symbols-section p { font-size: 0.82rem; color: #666; margin-bottom: 6px; font-weight: bold; text-transform: uppercase; }
+  .sym-list { display: flex; gap: 8px; flex-wrap: wrap; }
+  .sym-chip { background: #fff8ec; border: 1px solid #e8c96a; border-radius: 4px; padding: 4px 12px; font-size: 0.82rem; color: #7a5a00; }
+  .tabs { display: flex; border-bottom: 2px solid #4a235a; margin-bottom: 0; }
+  .tab-btn { padding: 10px 20px; border: none; background: #eee; cursor: pointer; font-size: 0.88rem; color: #555; border-top: 1px solid #ccc; border-left: 1px solid #ccc; border-right: 1px solid #ccc; border-radius: 4px 4px 0 0; margin-right: 4px; }
+  .tab-btn.active { background: #4a235a; color: white; border-color: #4a235a; }
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+  .interp-box { padding: 20px; border: 1px solid #ccc; border-top: none; border-radius: 0 0 6px 6px; background: white; font-size: 0.93rem; line-height: 1.75; color: #333; margin-bottom: 16px; }
+  .interp-box b { color: #4a235a; }
+  .bar-section h4 { font-size: 0.88rem; color: #555; margin-bottom: 10px; font-weight: bold; text-transform: uppercase; }
+  .bar-row { margin-bottom: 10px; }
+  .bar-label { font-size: 0.85rem; color: #444; margin-bottom: 3px; display: flex; justify-content: space-between; }
+  .bar-track { height: 10px; background: #e0e0e0; border-radius: 4px; overflow: hidden; }
+  .bar-fill { height: 100%; background: #4a235a; border-radius: 4px; }
+
+</style>
+</head>
+<body>
+
+<header>
+  <h1>DreamSense</h1>
+  <p>Dream Analysis and Prediction System</p>
+</header>
+
+<div class="container">
+
+  <div id="form-section">
+    <div class="box">
+      <div>
+        <label for="dream-desc">Describe Your Dream</label>
+        <textarea id="dream-desc" placeholder="Write your dream here in as much detail as you remember..."></textarea>
+      </div>
+      <div class="row">
+        <div>
+          <label for="zodiac">Zodiac Sign</label>
+          <select id="zodiac">
+            <option>Aries</option><option>Taurus</option><option>Gemini</option>
+            <option>Cancer</option><option>Leo</option><option>Virgo</option>
+            <option>Libra</option><option>Scorpio</option><option>Sagittarius</option>
+            <option>Capricorn</option><option>Aquarius</option><option>Pisces</option>
+          </select>
+        </div>
+        <div>
+          <label for="age">Age</label>
+          <input type="number" id="age" value="22" min="10" max="90">
+        </div>
+        <div>
+          <label for="mood-hint">Dream Mood</label>
+          <select id="mood-hint">
+            <option value="">Not sure</option>
+            <option>Anxious</option><option>Peaceful</option><option>Exciting</option>
+            <option>Fearful</option><option>Joyful</option><option>Sad</option>
+            <option>Frustrated</option><option>Wonder</option><option>Determined</option>
+          </select>
+        </div>
+      </div>
+      <button class="btn" onclick="analyzeDream()">Analyze My Dream</button>
+    </div>
+  </div>
+
+  <div id="loading"><p>Analyzing your dream, please wait...</p></div>
+  <div id="error-box"><div class="error-msg" id="error-text"></div></div>
+
+  <div id="results">
+    <div class="result-summary">
+      <h2>Dream Analysis Result</h2>
+      <div class="tags">
+        <span class="tag" id="res-category">Category</span>
+        <span class="tag mood" id="res-mood">Mood</span>
+        <span class="tag conf" id="res-conf">Confidence</span>
+      </div>
+    </div>
+
+    <div id="symbols-section" class="symbols-section" style="display:none;">
+      <p>Symbols Found in Your Dream</p>
+      <div class="sym-list" id="symbols-row"></div>
+    </div>
+
+    <div class="tabs">
+      <button class="tab-btn active" onclick="showTab('astro', this)">Astrological</button>
+      <button class="tab-btn" onclick="showTab('spirit', this)">Spiritual</button>
+      <button class="tab-btn" onclick="showTab('psych', this)">Psychological</button>
+    </div>
+    <div id="tab-astro" class="tab-content active"><div class="interp-box" id="astro-text"></div></div>
+    <div id="tab-spirit" class="tab-content"><div class="interp-box" id="spirit-text"></div></div>
+    <div id="tab-psych" class="tab-content"><div class="interp-box" id="psych-text"></div></div>
+
+    <div class="box bar-section">
+      <h4>Category Probability</h4>
+      <div id="bar-container"></div>
+    </div>
+
+    <button class="btn-secondary" onclick="resetForm()">Analyze Another Dream</button>
+  </div>
+
+</div>
+
+
+
+<script>
+  function showTab(name, btn) {
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('tab-' + name).classList.add('active');
+    btn.classList.add('active');
+  }
+
+  async function analyzeDream() {
+    const desc   = document.getElementById('dream-desc').value.trim();
+    const zodiac = document.getElementById('zodiac').value;
+    const age    = document.getElementById('age').value;
+
+    document.getElementById('error-box').style.display = 'none';
+    document.getElementById('results').style.display = 'none';
+    document.getElementById('form-section').style.display = 'none';
+    document.getElementById('loading').style.display = 'block';
+
+    try {
+      const resp = await fetch('/analyze', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ description: desc, zodiac, age })
+      });
+      const data = await resp.json();
+      document.getElementById('loading').style.display = 'none';
+
+      if (data.error) {
+        document.getElementById('form-section').style.display = 'block';
+        document.getElementById('error-box').style.display = 'block';
+        document.getElementById('error-text').textContent = data.error;
+        return;
+      }
+
+      document.getElementById('res-category').textContent = 'Category: ' + data.category;
+      document.getElementById('res-mood').textContent = 'Mood: ' + data.mood;
+      document.getElementById('res-conf').textContent = 'Confidence: ' + data.confidence + '%';
+
+      document.getElementById('astro-text').innerHTML = data.astro;
+      document.getElementById('spirit-text').innerHTML = data.spiritual;
+      document.getElementById('psych-text').innerHTML = data.psych;
+
+      const symsRow = document.getElementById('symbols-row');
+      symsRow.innerHTML = '';
+      if (data.symbols && data.symbols.length > 0) {
+        data.symbols.forEach(s => {
+          const chip = document.createElement('span');
+          chip.className = 'sym-chip';
+          chip.textContent = s.charAt(0).toUpperCase() + s.slice(1);
+          symsRow.appendChild(chip);
+        });
+        document.getElementById('symbols-section').style.display = 'block';
+      } else {
+        document.getElementById('symbols-section').style.display = 'none';
+      }
+
+      const bc = document.getElementById('bar-container');
+      bc.innerHTML = '';
+      data.top3.forEach(([cat, pct]) => {
+        const row = document.createElement('div');
+        row.className = 'bar-row';
+        row.innerHTML = '<div class="bar-label"><span>' + cat + '</span><span>' + pct + '%</span></div><div class="bar-track"><div class="bar-fill" style="width:' + pct + '%"></div></div>';
+        bc.appendChild(row);
+      });
+
+      document.getElementById('results').style.display = 'block';
+      document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById('tab-astro').classList.add('active');
+      document.querySelector('.tab-btn:nth-child(1)').classList.add('active');
+
+    } catch(e) {
+      document.getElementById('loading').style.display = 'none';
+      document.getElementById('form-section').style.display = 'block';
+      document.getElementById('error-box').style.display = 'block';
+      document.getElementById('error-text').textContent = 'Connection error. Please try again.';
+    }
+  }
+
+  function resetForm() {
+    document.getElementById('results').style.display = 'none';
+    document.getElementById('form-section').style.display = 'block';
+  }
+</script>
+</body>
+</html>
