@@ -1,4 +1,4 @@
-# 🌙 DreamSense — Dream Analysis & Prediction System
+# 🌙 DreamSense  Dream Analysis & Prediction System
 
 ---
 
